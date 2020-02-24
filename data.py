@@ -8,7 +8,6 @@ Created on Mon Feb 24 16:24:05 2020
 class Data:
     """ Class for managing, storing, and broadcasting data
         transmitted from the camera.
-        
     """
     
     def __init__(self):
@@ -49,34 +48,34 @@ class Data:
     
 
 class Broadcast:
-    """ Class for connecting to a peer and transmitting data
+    """ Class for connecting to a peer and transmitting data.
     """
     
     def _init__(self, peer):
         self.peer = peer
-        
+
         self._connect()
-        
+
     def _connect(self):
-        """ Connect RPi to peer
+        """ Connect to peer
         """
         if not self._verify_connection():
             raise RuntimeError("Could not connect to peer.")
-    
+
     def _verify_connection(self):
         """ Check if connected to peer
         """
         connected = False
-        
+
         return connected
-        
+
     def broadcast_data(self, data):
         """ Transmit data to peer
         """
         if not self._verify_connection():
             self._connect()
         pass
-    
+
     def read_data(self):
         """ Accept data from peer
         """
