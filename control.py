@@ -4,10 +4,12 @@ Created on Mon Feb 24 16:27:51 2020
 
 @author: mberutti
 """
-
-from smarttoilet.signals import SignalIn, SignalOut
+import time
 
 from gpiozero import LED
+
+
+from smarttoilet.signals import SignalIn, SignalOut
 
 class Control:
     """ Class for controlling entire system
@@ -28,6 +30,7 @@ class Control:
         self.error = LED(40)
         
         self.run()
+            
     
     def __exit__(self):
         """ Turn off LEDs and outputs when exiting
@@ -47,23 +50,40 @@ class Control:
         self.motor.off()
         self.wash.off()
         
+    def analyze(self):
+        """ Control method for analyzing the sample.
+            Runs until complete or an error occurs.
+        """
+        self._stop_all()
+        # run the following while the power switch is on
+        try:
+            while True:
+                if not self.power.update():
+                    break
+        except:
+            # turn on error indicator and turn off else
+            self._stop_all()
+            self.error.on
+        
     def run(self):
         """ Automation system
-        """
+        """        
         # run continuously after initialization
         while True:
-            # run the following while the power switch is on
-            while self.power.update():
-                try:
-                    continue
-                
-                except:
-                    # turn on error indicator and turn off else
-                    self._stop_all()
-                    self.error.on
+            # run analysis if power switch is on, there is fluid in the
+            # system, and there isn't a prevailing error
+            if self.power.update() and \
+                    self.fluid.update() and \
+                    not self.error.is_active:
+                self.analyze()
             
-            # turn off everything once power is off
-            self._stop_all()
+            # if the power switch is off, turn off everything
+            # resets the error light
+            elif not self.power.update():
+                self._stop_all()
+                
+            time.sleep(5)
         
 
 Control()
+    
