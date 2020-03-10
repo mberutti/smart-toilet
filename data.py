@@ -51,7 +51,7 @@ class Broadcast:
     """ Class for connecting to a peer and transmitting data.
     """
     
-    def _init__(self, peer):
+    def __init__(self, peer):
         self.peer = peer
 
         self._connect()
