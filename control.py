@@ -5,11 +5,65 @@ Created on Mon Feb 24 16:27:51 2020
 @author: mberutti
 """
 
-from gpiozero import Button, LED
+from smarttoilet.signals import SignalIn, SignalOut
+
+from gpiozero import LED
 
 class Control:
     """ Class for controlling entire system
     """
     def __init__(self):
-        pass
+        # input signals
+        self.power = SignalIn(7, led=(11, 12))
+        self.fluid = SignalIn(13, led=15)
+        self.force_wash = SignalIn(29)
         
+        # output signals
+        self.motor = SignalOut(16)
+        self.wash = SignalOut(31, led=32)
+        
+        # other indicators
+        self.cam_led = LED(33)
+        self.analysis_led = (LED(35), LED(36))
+        self.error = LED(40)
+        
+        self.run()
+    
+    def __exit__(self):
+        """ Turn off LEDs and outputs when exiting
+        """
+        self._stop_all()
+        
+    def _stop_all(self):
+        """ Turn off all outputs and LEDs
+        """
+        # LEDs
+        self.cam_led.off
+        self.analysis_led[0].off
+        self.analysis_led[1].off
+        self.error.off
+        
+        # motors
+        self.motor.off()
+        self.wash.off()
+        
+    def run(self):
+        """ Automation system
+        """
+        # run continuously after initialization
+        while True:
+            # run the following while the power switch is on
+            while self.power.update():
+                try:
+                    continue
+                
+                except:
+                    # turn on error indicator and turn off else
+                    self._stop_all()
+                    self.error.on
+            
+            # turn off everything once power is off
+            self._stop_all()
+        
+
+Control()
