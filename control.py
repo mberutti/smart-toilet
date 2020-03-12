@@ -94,7 +94,7 @@ class Control:
                     i = self.samps_after_sensor_off
                     
             # change indicator lights, given complete or power off
-            if i = 0:
+            if i == 0:
                 self.analysis_led[1].off
                 self.analysis_led[0].on
             else:
