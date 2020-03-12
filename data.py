@@ -10,8 +10,8 @@ class Data:
         transmitted from the camera.
     """
     
-    def __init__(self):
-        self.results_path = "results"
+    def __init__(self, data_path):
+        self.data_path = data_path
         self.results = None
         
         self._purge_results()
