@@ -4,6 +4,7 @@ Created on Mon Feb 24 16:27:51 2020
 
 @author: mberutti
 """
+
 import time
 
 from gpiozero import LED
@@ -27,7 +28,17 @@ class Control:
         # other indicators
         self.cam_led = LED(33)
         self.analysis_led = (LED(35), LED(36))
+        self.data_led = LED(37)
         self.error = LED(40)
+        
+        # camera
+        self.camera = None
+        
+        # other system settings
+        self.pump_runtime = 1.0
+        self.num_images = 1000
+        self.rest_time = 0.25
+        self.samps_after_sensor_off = 30
         
         self.run()
             
@@ -57,9 +68,43 @@ class Control:
         self._stop_all()
         # run the following while the power switch is on
         try:
-            while True:
+            # setup
+            self.analysis_led[1].blink
+            
+            # run motor & imaging
+            i = self.num_images
+            fluid_left = True
+            while self.power.update() and i > 1:
+                
+                # run pump
+                self.motor.run(self.pump_runtime)
+                
                 if not self.power.update():
                     break
+                
+                # image
+                time.sleep(self.rest_time)
+                self.cam_led.on
+                '''CAPTURE IMAGE'''
+                self.cam_led.off
+                
+                i -= 1
+                if fluid_left and not self.fluid.update():
+                    fluid_left = False
+                    i = self.samps_after_sensor_off
+                    
+            # change indicator lights, given complete or power off
+            if i = 0:
+                self.analysis_led[1].off
+                self.analysis_led[0].on
+            else:
+                self.analysis_led[1].on
+            
+            # transmit data whether or not power switched off
+            self.data_led.blink
+            '''TRANSMIT DATA'''
+            self.data_led.off
+                
         except:
             # turn on error indicator and turn off else
             self._stop_all()

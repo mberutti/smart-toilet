@@ -59,3 +59,15 @@ class SignalOut:
     """
     def __init__(self, pin, **kwargs):
         pass
+      
+    def __exit__(self):
+        pass
+    
+    def run(self, time):
+        pass
+    
+    def start(self):
+        pass
+    
+    def stop(self):
+        pass
