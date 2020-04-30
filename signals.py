@@ -5,7 +5,7 @@ Created on Mon Feb 24 16:05:33 2020
 @author: mberutti
 """
 
-from gpiozero import Button, LED
+from led_test import Button, LED
 
 class SignalIn:
     """ Class to manage GPIO input signals (buttons)

@@ -7,10 +7,12 @@ Created on Mon Feb 24 16:27:51 2020
 
 import time
 
-from gpiozero import LED
+# from gpiozero import LED
+from led_test import LED
 
-from smarttoilet.signals import SignalIn, SignalOut
-from smarttoilet.data import Data, Broadcast
+from signals import SignalIn, SignalOut
+from data import Data, Broadcast
+from camera import Camera
 
 class Control:
     """ Class for controlling entire system
@@ -32,11 +34,11 @@ class Control:
         self.error = LED(40)
         
         # camera
-        self.camera = None
+        self.camera = Camera()
         
         # other system settings
         self.pump_runtime = 1.0
-        self.num_images = 1000
+        self.num_images = 5
         self.rest_time = 0.25
         self.samps_after_sensor_off = 30
         
@@ -61,8 +63,8 @@ class Control:
         self.error.off
         
         # motors
-        self.motor.off()
-        self.wash.off()
+        self.motor.stop()
+        self.wash.stop()
         
     def analyze(self):
         """ Control method for analyzing the sample.
@@ -81,7 +83,7 @@ class Control:
             data_session = Data(self.data_path)
             
             # run motor & imaging
-            while self.power.update() and ims_left > 1:
+            while self.power.update() and ims_left > 0:
                 # run pump
                 self.motor.run(self.pump_runtime)
                 
@@ -91,7 +93,7 @@ class Control:
                 # image
                 time.sleep(self.rest_time)
                 self.cam_led.on
-                '''CAPTURE IMAGE'''
+                self.camera.capture()
                 data_session.fetch_data()
                 self.cam_led.off
                 
