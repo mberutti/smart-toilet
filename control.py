@@ -17,30 +17,40 @@ from camera import Camera
 class Control:
     """ Class for controlling entire system
     """
-    def __init__(self):
+    def __init__(self,
+                 ml_per_image,
+                 ml_total,
+                 ml_to_trigger_sensor,
+                 images_per_step,
+                 pump_runtime,
+                 pump_q,
+                 rest_time):
+        
         # input signals
-        self.power = SignalIn(7, led=(11, 12))
-        self.fluid = SignalIn(13, led=15)
-        self.force_wash = SignalIn(29)
+        self.power = SignalIn(7)
+        self.fluid = SignalIn(11, led=12)
+        self.force_wash = SignalIn(13)
         
         # output signals
-        self.motor = SignalOut(16)
-        self.wash = SignalOut(31, led=32)
+        self.motor = SignalOut(15)
+        self.wash = SignalOut(16)
         
         # other indicators
-        self.cam_led = LED(33)
-        self.analysis_led = (LED(35), LED(36))
-        self.data_led = LED(37)
-        self.error = LED(40)
+        self.wash_led = LED(29)
+        self.cam_led = LED(31)
+        self.analysis_led = (LED(32), LED(33))
+        self.data_led = LED(35)
+        self.error = LED(36)
         
         # camera
         self.camera = Camera()
         
         # other system settings
-        self.pump_runtime = 1.0
-        self.num_images = 5
-        self.rest_time = 0.25
-        self.samps_after_sensor_off = 30
+        self.pump_runtime = pump_runtime
+        self.num_images = ml_total / ml_per_image
+        self.rest_time = rest_time
+        self.samps_after_sensor_off = ml_to_trigger_sensor / \
+                                      (pump_q * pump_runtime)
         
         self.peer_ip = None
         self.data_path = "results"
@@ -148,7 +158,4 @@ class Control:
                 self._stop_all()
                 
             time.sleep(5)
-        
-
-Control()
     
